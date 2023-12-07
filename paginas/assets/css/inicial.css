@@ -1,0 +1,29 @@
+* {
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+body {
+    background-color: gainsboro;
+}
+
+.altinha {
+    padding-top: 100px;
+}
+
+.color {
+    color: darkblue;
+    font-size: 75px;
+    text-shadow: 10px 10px 50px black;
+}
+
+.par {
+    font-size: 30px;
+}
+
+.last-acess {
+    color: forestgreen;
+}
+
+u {
+    text-decoration: underline;
+}

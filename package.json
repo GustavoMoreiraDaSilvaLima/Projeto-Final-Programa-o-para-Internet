@@ -1,0 +1,35 @@
+{
+  "name": "projeto-final-programa-o-para-internet",
+  "version": "1.0.0",
+  "description": "Projeto Final de Programação para Internet: Bate-papo Web",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GustavoMoreiraDaSilvaLima/Projeto-Final-Programa-o-para-Internet.git"
+  },
+  "keywords": [
+    "WebSite",
+    "autenticação",
+    "Post",
+    "Login",
+    "BatePapo",
+    "servidor",
+    "Vercel"
+  ],
+  "author": "Gustavo Moreira Da Silva Lima",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/GustavoMoreiraDaSilvaLima/Projeto-Final-Programa-o-para-Internet/issues"
+  },
+  "homepage": "https://github.com/GustavoMoreiraDaSilvaLima/Projeto-Final-Programa-o-para-Internet#readme",
+  "dependencies": {
+    "cookie-parser": "^1.4.6",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3"
+  }
+}

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autenticação</title>
+    <link rel="icon" href="/paginas/assets/img/cadeado.png">
+    <link rel="stylesheet" href="/paginas/assets/css/login.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    
+</head>
+
+<body class="fundo">
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-sm border border-success rounded quadrado">
+                <div class="my-5 ml-5">
+                    <h1>Cadastrar</h1>
+                    <form action="/login" method="POST">
+                        <label for="email">E-mail:</label>
+                        <input type="text" id="usucriado" name="usucriado" placeholder="email@email.com"
+                            class="form-control col-md-7"><br>
+                        <label for="senha">Senha:</label>
+                        <input type="password" id="senhacriado" name="senhacriado" placeholder="Senha"
+                            class="form-control col-md-5"><br>
+                        <label for="NomeUsu">Nome de Usuario</label>
+                        <input type="text" id="nomecriado" name="nomecriado" class="form-control col-md-7" placeholder="Nome"><br>
+                        <label for="apelido">Apelido</label>
+                        <input type="text" id="apelidocriado" name="apelidocriado" class="form-control col-md-7" placeholder="Apelido"><br>
+                        <input type="reset" class="btn btn-danger" value="Limpar Dados">
+                        <input type="submit" class="btn btn-success ml-1" value="Criar Conta">
+                    </form>
+                </div>
+            </div>
+            <div class="col-sm border border-info ml-1  rounded quadrado">
+                <div class="my-5 ml-5">
+                    <h1>Login</h1>
+                    <form action='/login' method='POST'>
+                        <label for="login">E-mail:</label>
+                        <input class="form-control col-md-7" type="text" id="login" name="login" placeholder="email@email.com">
+                        <br>
+                        <label for="password">Senha:</label>
+                        <input class="form-control col-md-5" type="password" id="password" name="password"
+                            placeholder="Senha">
+                        <br>
+                        <input type="reset" class="btn btn-danger" value="Limpar">
+                        <input type="submit" class="btn btn-success ml-1" value="Login">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
