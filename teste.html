@@ -13,17 +13,24 @@
 </head>
 
 <body>
-    <div class="container col-7">
+    <div  class="float-right">
+        <button class="ml-3 btn btn-danger" onclick="Logout">Encerrar Sessão</button>
+    </div>
+    <div class="float-right">
+        <p>Olá ${UsuarioRegis.nome}</p>
+    </div>
+    <div class="container col-7 ">
         <h1 class="text-center color"><u>Menu</u></h1>
         <div class="altinha">
             <ul>
-            <li class="par"><a href="/paginas/cadastrarUsuario.html">Cadastro de Usuario</a></li>
-            <li class="par"><a href="/paginas/postarMensagem.html">Bate-Papo</a></li>
-        </ul>
+                <li class="par"><a href="/paginas/cadastrarUsuario.html">Cadastro de Usuario</a></li>
+                <li class="par"><a href="/paginas/postarMensagem.html">Bate-Papo</a></li>
+            </ul>
         </div>
 
     </div>
-    <p class="par text-right" style="margin-top: 500px;">Seu Ultimo acesso foi em <strong class="last-acess">${dataUltimoAcesso}</strong></p>
+    <p class="par text-right" style="margin-top: 500px;">Seu Ultimo acesso foi em <strong
+            class="last-acess">${dataUltimoAcesso}</strong></p>
 
 </body>
 

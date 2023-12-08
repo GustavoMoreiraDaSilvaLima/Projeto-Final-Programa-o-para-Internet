@@ -18,17 +18,18 @@
             <div class="col-sm border border-success rounded quadrado">
                 <div class="my-5 ml-5">
                     <h1>Cadastrar</h1>
-                    <form action="/login" method="POST">
+                    <form action="/registrar" method="POST">
+                        <label for="NomeUsu">Nome de Usuario</label>
+                        <input type="text" id="nomecriado" name="nomecriado" class="form-control col-md-7" placeholder="Nome"><br>
                         <label for="email">E-mail:</label>
                         <input type="text" id="usucriado" name="usucriado" placeholder="email@email.com"
                             class="form-control col-md-7"><br>
                         <label for="senha">Senha:</label>
                         <input type="password" id="senhacriado" name="senhacriado" placeholder="Senha"
                             class="form-control col-md-5"><br>
-                        <label for="NomeUsu">Nome de Usuario</label>
-                        <input type="text" id="nomecriado" name="nomecriado" class="form-control col-md-7" placeholder="Nome"><br>
-                        <label for="apelido">Apelido</label>
-                        <input type="text" id="apelidocriado" name="apelidocriado" class="form-control col-md-7" placeholder="Apelido"><br>
+
+                        <label for="confsenha">Confirmar Senha</label>
+                        <input type="password" id="confsenha" name="confsenha" class="form-control col-md-7" placeholder="Confirmar Senha"><br>
                         <input type="reset" class="btn btn-danger" value="Limpar Dados">
                         <input type="submit" class="btn btn-success ml-1" value="Criar Conta">
                     </form>
@@ -39,10 +40,10 @@
                     <h1>Login</h1>
                     <form action='/login' method='POST'>
                         <label for="login">E-mail:</label>
-                        <input class="form-control col-md-7" type="text" id="login" name="login" placeholder="email@email.com">
+                        <input class="form-control col-md-7" type="text" id="emailcadas" name="emailcadas" placeholder="email@email.com">
                         <br>
                         <label for="password">Senha:</label>
-                        <input class="form-control col-md-5" type="password" id="password" name="password"
+                        <input class="form-control col-md-5" type="password" id="senhacadas" name="senhacadas"
                             placeholder="Senha">
                         <br>
                         <input type="reset" class="btn btn-danger" value="Limpar">

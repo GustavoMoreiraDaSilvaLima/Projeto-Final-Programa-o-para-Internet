@@ -4,7 +4,7 @@ import cookieParser from 'cookie-parser';
 import session from 'express-session';
 var UsuarioRegis = [];
 var ListadeUsuario = [];
-
+var UsuAtual = "";
 const porta = 3000;
 const host = '0.0.0.0';
 
@@ -28,8 +28,9 @@ app.use(session({
 }))
 
 app.get('/', autenticar, PaginaMenu);
-//app.post('/Cadastro', autenticar, processaCadastroUsuario);
+app.get('/sair', Logout);
 
+app.post('/registrar', Cadastro);
 app.post('/login', ValidarLogin);
 app.post('/cadastrarUsuario', autenticar, processaCadastroUsuario);
 
@@ -62,13 +63,19 @@ function PaginaMenu(requisicao, resposta) {
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Menu do Sistema</title>
-      <link rel="icon" href="/logo.jpg">
+      <link rel="icon" href="/logo.png">
       <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
           integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
       <link rel="stylesheet" href="/inicial.css">
   </head>
   
   <body>
+        <div  class="float-right">
+        <a href="/sair"><button class="ml-3 btn btn-danger">Encerrar Sessão</button></a>
+      </div>
+      <div class="float-right">
+        <p>Olá ${UsuAtual}</p>
+      </div>
       <div class="container col-7">
           <h1 class="text-center color"><u>Menu</u></h1>
           <div class="altinha">
@@ -87,52 +94,50 @@ function PaginaMenu(requisicao, resposta) {
   `
   );
 }
-function Logout(requisicao, resposta){
+function Logout(requisicao, resposta) {
   requisicao.session.usuarioAutenticado = false;
   resposta.redirect('/login.html');
+
+  console.log("------Console de Pessoas Logadas--------");
+  for (let dados of UsuarioRegis) {
+    console.log("Email:", dados.email);
+    console.log("Senha:", dados.senha);
+    console.log("Nome:", dados.nome);
+    console.log("----------------------------------------")
+  }
 }
 
 function ValidarLogin(requisicao, resposta) {
-  const email = requisicao.body.login;
-  const senha = requisicao.body.password;
+  const email = requisicao.body.emailcadas;
+  const senha = requisicao.body.senhacadas;
 
-  const registUsu = requisicao.body.usucriado;
-  const senhaRegis = requisicao.body.senhacriado;
-  const Apelido = requisicao.body.apelidocriado;
-  const NomeUsu = requisicao.body.nomecriado;
 
-  let UsuarioFinal;
-  let SenhaFinal;
-  //enviar/guardar na variavel
-  if ((registUsu != '') && (senhaRegis != '') && (Apelido != '') && (NomeUsu != '')) {
-    const usuario = {
-      email: registUsu,
-      senha: senhaRegis,
-      nome: NomeUsu,
-      nickname: Apelido
-    };
 
-    UsuarioRegis.push(usuario);
 
-    UsuarioFinal = registUsu;
-    SenhaFinal = senhaRegis;
-  }
-  else {
-    UsuarioFinal = email;
-    SenhaFinal = senha;
-  }
-  for (let dados of UsuarioRegis) {
-    if (UsuarioFinal && SenhaFinal && (UsuarioFinal == dados.email) && (SenhaFinal == dados.senha)) {
-      requisicao.session.usuarioAutenticado = true;
-      resposta.redirect('/');
+  if (email && senha)
+    for (let dados of UsuarioRegis) {
+      if ((email === dados.email) && (senha === dados.senha)) {
+        requisicao.session.usuarioAutenticado = true;
+
+
+
+
+        //Guardar o nome do usuario atualmente Logado
+        const UsuarioAtual = BuscaBancoDeDados(email, senha);
+        UsuAtual = UsuarioAtual;
+        resposta.redirect('/');
+
+        //Listar o login para o servidor
+        console.log("Usuario Logado: ", UsuAtual);
+      }
     }
-  }
   resposta.end(`
         <!DOCTYPE html>
     <html lang="pt-br">
 
     <head>
         <meta charset="UTF-8">
+        <link rel="icon" href="/erro.png">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Falha na Autenticação</title>
     </head>
@@ -144,6 +149,166 @@ function ValidarLogin(requisicao, resposta) {
       `);
 }
 
+function Cadastro(requisicao, resposta) {
+  const NomeUsu = requisicao.body.nomecriado;
+  const registUsu = requisicao.body.usucriado;
+  const senhaRegis = requisicao.body.senhacriado;
+  const confSenha = requisicao.body.confsenha;
+
+
+  //enviar/guardar na variavel
+  if (!(registUsu && senhaRegis && NomeUsu && senhaRegis) || (senhaRegis != confSenha)) {
+    let conteudoResposta = '';
+    conteudoResposta += `<!DOCTYPE html>
+      <html lang="pt-br">
+      
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Autenticação</title>
+          <link rel="icon" href="/cadeado.png">
+          <link rel="stylesheet" href="/login.css">
+          <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+              integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+          
+      </head>
+      
+      <body class="fundo">
+          <div class="container mt-5">
+              <div class="row">
+                  <div class="col-sm border border-success rounded quadrado">
+                      <div class="my-5 ml-5">
+                          <h1>Cadastrar</h1>
+                          <form action="/registrar" method="POST">
+                              <label for="NomeUsu">Nome de Usuario</label>
+                              <input type="text" id="nomecriado" name="nomecriado" value="${NomeUsu}"class="form-control col-md-7" placeholder="Nome"><br>
+                              `;
+    if (!NomeUsu) {
+      conteudoResposta += `
+                                <p class="text-danger">Informe um nome de Usuário</p>
+                                `
+    }
+
+    conteudoResposta += `
+                              <label for="email">E-mail:</label>
+                              <input type="text" id="usucriado" name="usucriado" value="${registUsu}" placeholder="email@email.com"
+                                  class="form-control col-md-7"><br>`;
+    if (!registUsu) {
+      conteudoResposta += `
+                                <p class="text-danger">Informe um Email</p>
+                                `
+    }
+    conteudoResposta += `
+                              <label for="senha">Senha:</label>
+                              <input type="password" id="senhacriado" name="senhacriado" value="${senhaRegis}" placeholder="Senha"
+                                  class="form-control col-md-5"><br>`
+    if (!senhaRegis) {
+      conteudoResposta += `
+      <p class="text-danger">Senha nao pode estar <strong>vazio</strong></p>
+      `
+    }
+    conteudoResposta += `
+                              <label for="confsenha">Confirmar Senha</label>
+                              <input type="password" id="confsenha" name="confsenha" value="${confSenha}" class="form-control col-md-7" placeholder="Confirmar Senha"><br>`
+    if (!confSenha || senhaRegis != confSenha) {
+      conteudoResposta += `
+                            <p class="text-danger">Senha não <strong>coincidem</strong></p>
+                          `
+    }
+    conteudoResposta += `
+                              <input type="reset" class="btn btn-danger" value="Limpar Dados">
+                              <input type="submit" class="btn btn-success ml-1" value="Criar Conta">
+                          </form>
+                      </div>
+                  </div>
+                  <div class="col-sm border border-info ml-1  rounded quadrado">
+                      <div class="my-5 ml-5">
+                          <h1>Login</h1>
+                          <form action='/login' method='POST'>
+                              <label for="login">E-mail:</label>
+                              <input class="form-control col-md-7" type="text" id="emailcadas" name="emailcadas" placeholder="email@email.com">
+                              <br>
+                              <label for="password">Senha:</label>
+                              <input class="form-control col-md-5" type="password" id="senhacadas" name="senhacadas"
+                                  placeholder="Senha">
+                              <br>
+                              <input type="reset" class="btn btn-danger" value="Limpar">
+                              <input type="submit" class="btn btn-success ml-1" value="Login">
+                          </form>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      
+      </body>
+      
+      </html>`
+
+
+
+    resposta.end(conteudoResposta);
+  }
+  else {
+    const usuario = {
+      email: registUsu,
+      senha: senhaRegis,
+      nome: NomeUsu
+    };
+
+    UsuarioRegis.push(usuario);//guardar no Array
+
+    let conteudoResposta = `
+    <!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conta Criada com sucesso</title>
+    <link rel="icon" href="/cadeado.png">
+    <link rel="stylesheet" href="/contacriada.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+</head>
+
+<body class="fundo">
+    <div class="altinha">
+        <div class="container mt-5 fundo1">
+            <div class="row">
+                <div class="col-sm border border-success rounded">
+                    <div class="my-5 ml-5">
+                        <h1 class="text-center">Conta criada com sucesso</h1>
+                        <a href="/login.html"><button class="btn btn btn-success btn-lg meio">Clique Aqui para
+                                Prosseguir e logar corretamente</button></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+    `;
+    let pos = UsuarioRegis.length;
+    console.log("----Usuario Cadastro com sucesso----");
+    console.log(UsuarioRegis[pos - 1].nome);
+    console.log(UsuarioRegis[pos - 1].email);
+    console.log(UsuarioRegis[pos - 1].senha);
+    console.log("-------------------------------------");
+    resposta.end(conteudoResposta);
+
+  }
+}
+
+function BuscaBancoDeDados(email, senha) {
+  let nome = "";
+  for (let busca of UsuarioRegis) {
+    if (email == busca.email && senha == busca.senha) {
+      nome = busca.nome;
+    }
+  }
+  return nome;
+}
 function processaCadastroUsuario(requisicao, resposta) {
   let conteudoResposta = ``;
   const dados = requisicao.body;
