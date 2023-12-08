@@ -2,7 +2,8 @@ import express from 'express';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
-var UsuarioRegis = []
+var UsuarioRegis = [];
+var ListadeUsuario = [];
 
 const porta = 3000;
 const host = '0.0.0.0';
@@ -11,6 +12,7 @@ const app = express();
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(process.cwd(), 'paginas')));
+app.use(express.static(path.join(process.cwd(), 'paginas/assets')));
 app.use(express.static(path.join(process.cwd(), 'paginas/assets/css')));
 app.use(express.static(path.join(process.cwd(), 'paginas/assets/img')));
 app.use(express.static(path.join(process.cwd(), 'paginas/assets/js')));
@@ -25,11 +27,11 @@ app.use(session({
   }
 }))
 
-app.get('/')
 app.get('/', autenticar, PaginaMenu);
 //app.post('/Cadastro', autenticar, processaCadastroUsuario);
 
 app.post('/login', ValidarLogin);
+app.post('/cadastrarUsuario', autenticar, processaCadastroUsuario);
 
 app.listen(porta, host, () => {
   console.log(`Servidor executando na url http://${host}:${porta}`);
@@ -60,10 +62,10 @@ function PaginaMenu(requisicao, resposta) {
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Menu do Sistema</title>
-      <link rel="icon" href="/paginas/assets/img/logo.jpg">
+      <link rel="icon" href="/logo.jpg">
       <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
           integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-      <link rel="stylesheet" href="/paginas/assets/css/inicial.css">
+      <link rel="stylesheet" href="/inicial.css">
   </head>
   
   <body>
@@ -71,8 +73,8 @@ function PaginaMenu(requisicao, resposta) {
           <h1 class="text-center color"><u>Menu</u></h1>
           <div class="altinha">
               <ul>
-              <li class="par"><a href="/paginas/cadastrarUsuario.html">Cadastro de Usuario</a></li>
-              <li class="par"><a href="/paginas/postarMensagem.html">Bate-Papo</a></li>
+              <li class="par"><a href="/cadastrarUsuario.html">Cadastro de Usuario</a></li>
+              <li class="par"><a href="/postarMensagem.html">Bate-Papo</a></li>
           </ul>
           </div>
   
@@ -85,9 +87,13 @@ function PaginaMenu(requisicao, resposta) {
   `
   );
 }
+function Logout(requisicao, resposta){
+  requisicao.session.usuarioAutenticado = false;
+  resposta.redirect('/login.html');
+}
 
 function ValidarLogin(requisicao, resposta) {
-  const usuario = requisicao.body.login;
+  const email = requisicao.body.login;
   const senha = requisicao.body.password;
 
   const registUsu = requisicao.body.usucriado;
@@ -112,7 +118,7 @@ function ValidarLogin(requisicao, resposta) {
     SenhaFinal = senhaRegis;
   }
   else {
-    UsuarioFinal = usuario;
+    UsuarioFinal = email;
     SenhaFinal = senha;
   }
   for (let dados of UsuarioRegis) {
@@ -121,7 +127,7 @@ function ValidarLogin(requisicao, resposta) {
       resposta.redirect('/');
     }
   }
-    resposta.end(`
+  resposta.end(`
         <!DOCTYPE html>
     <html lang="pt-br">
 
@@ -136,4 +142,123 @@ function ValidarLogin(requisicao, resposta) {
       </body>
     </html>
       `);
+}
+
+function processaCadastroUsuario(requisicao, resposta) {
+  let conteudoResposta = ``;
+  const dados = requisicao.body;
+  if (!(dados.nome && dados.dataNasc && dados.nick)) {
+    conteudoResposta += `
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Usuario</title>
+    <link rel="icon" href="/Usuario.png">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+</head>
+
+<body>
+    <div class="container col-6 rounded">
+        <h1 class="p-3 mb-2 bg-primary text-white">Bem Vindo(a) ao Cadastro de Usuario</h1>
+        <form action="/cadastrarUsuario" method="POST">
+            <label for="fnome">Nome de Usuário</label>
+            <input type="text" class="form-control col-md-5" name="nome" id="nome" value="${dados.nome}">`;
+    if (!dados.nome) {
+      conteudoResposta += `
+            <div>
+                <p class="text-danger">Informe um nome de Usuário</p>
+            </div>
+            `;
+    }
+    conteudoResposta += `
+            <label for="DataNasc">Data de Nascimento</label>
+            <input type="date" class="form-control col-md-2" name="dataNasc" id="dataNasc" value="${dados.dataNasc}">`;
+    if (!dados.dataNasc) {
+      conteudoResposta += `
+            <div>
+                <p class="text-danger">Informe uma Data Valida</p>
+            </div>
+            `;
+    }
+    conteudoResposta += `
+            <label for="apelido">Apelido:</label>
+            <input type="text" class="form-control col-md-5" name="nick" id="nick" value="${dados.nick}">`;
+    if (!dados.nick) {
+      conteudoResposta += `
+  <div>
+      <p class="text-danger">Informe um Apelido</p>
+  </div>
+  `;
+    }
+
+    conteudoResposta += `
+    <div class="mt-2">
+                <input type="reset" class="btn btn-danger" value="Limpar Dados">
+                <input type="submit" class="btn btn-success ml-1" value="Criar Conta">
+            </div>
+            <a href="/"><button type="button" class="btn btn-outline-primary mt-3">Retornar ao Menu</button></a>
+        </form>
+    </div>
+</body>
+
+</html>
+    `;
+    resposta.end(conteudoResposta);
+  }
+  else {
+    const RegistroChat = {
+      nome: dados.nome,
+      data: dados.dataNasc,
+      apelido: dados.nick
+    }
+
+    ListadeUsuario.push(RegistroChat);
+
+    conteudoResposta += `
+    <!DOCTYPE html>
+    <head>
+        <title>Cadastrados</title>
+        <meta charset="UTF-8">
+        <link rel="icon" href="/Usuario.png">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    </head>
+    <body>
+        <h1 class="text-center">Lista de Usuários Cadastrados</h1>
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Nome de Usuario</th>
+                    <th scope="col">Data de Nascimento</th>
+                    <th scope="col">Apelido</th>
+                </tr>
+            </thead>
+            <tbody>`;
+    let i = 0;
+    for (let Cadastro of ListadeUsuario) {
+      conteudoResposta += `
+                        <tr>
+                            <th scope="row">${i}</th>
+                            <td>${Cadastro.nome}</td>
+                            <td>${Cadastro.data}</td>
+                            <td>@${Cadastro.apelido}</td>
+                        </tr>`;
+      i++;
+    }
+    conteudoResposta += `
+                        </tbody>
+                    </table>
+                    <a class="btn btn-light" href="/" role="button">Voltar ao menu</a>
+                    <a class="btn btn-dark ml-1" href="/cadastrarUsuario.html" role="button">Continuar cadastrando</a>
+                </body>
+            </html>
+                `;
+
+    resposta.end(conteudoResposta);
+  }
 }

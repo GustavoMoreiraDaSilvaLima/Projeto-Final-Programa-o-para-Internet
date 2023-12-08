@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro de Usuario</title>
-    <link rel="icon" href="assets/img/Usuario.png">
+    <link rel="icon" href="/Usuario.png">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
         integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 </head>
@@ -13,17 +13,18 @@
 <body>
     <div class="container col-6 rounded">
         <h1 class="p-3 mb-2 bg-primary text-white">Bem Vindo(a) ao Cadastro de Usuario</h1>
-        <form action="" method="">
+        <form action="/cadastrarUsuario" method="POST">
             <label for="fnome">Nome de Usuario</label>
-            <input type="text" class="form-control col-md-5">
+            <input type="text" class="form-control col-md-5" name="nome" id="nome">
             <label for="DataNasc">Data de Nascimento</label>
-            <input type="date" class="form-control col-md-2">
+            <input type="date" class="form-control col-md-2" name="dataNasc" id="dataNasc">
             <label for="apelido">Apelido:</label>
-            <input type="text" class="form-control col-md-5">
+            <input type="text" class="form-control col-md-5" name="nick" id="nick">
             <div class="mt-2">
                 <input type="reset" class="btn btn-danger" value="Limpar Dados">
                 <input type="submit" class="btn btn-success ml-1" value="Criar Conta">
             </div>
+            <a href="/"><button type="button" class="btn btn-outline-primary mt-3">Retornar ao Menu</button></a>
         </form>
     </div>
 </body>
