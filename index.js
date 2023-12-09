@@ -5,6 +5,8 @@ import session from 'express-session';
 var UsuarioRegis = [];
 var ListadeUsuario = [];
 var UsuAtual = "";
+var Usuario_Mensagem = [];
+
 const porta = 3000;
 const host = '0.0.0.0';
 
@@ -29,10 +31,13 @@ app.use(session({
 
 app.get('/', autenticar, PaginaMenu);
 app.get('/sair', Logout);
+app.get('/postarMensagem', autenticar, NovaMensagem);
 
 app.post('/registrar', Cadastro);
 app.post('/login', ValidarLogin);
 app.post('/cadastrarUsuario', autenticar, processaCadastroUsuario);
+app.post('/postarMensagem', autenticar, PostarMensagem);
+
 
 app.listen(porta, host, () => {
   console.log(`Servidor executando na url http://${host}:${porta}`);
@@ -81,7 +86,7 @@ function PaginaMenu(requisicao, resposta) {
           <div class="altinha">
               <ul>
               <li class="par"><a href="/cadastrarUsuario.html">Cadastro de Usuario</a></li>
-              <li class="par"><a href="/postarMensagem.html">Bate-Papo</a></li>
+              <li class="par"><a href="/postarMensagem">Bate-Papo</a></li>
           </ul>
           </div>
   
@@ -309,6 +314,7 @@ function BuscaBancoDeDados(email, senha) {
   }
   return nome;
 }
+
 function processaCadastroUsuario(requisicao, resposta) {
   let conteudoResposta = ``;
   const dados = requisicao.body;
@@ -404,7 +410,7 @@ function processaCadastroUsuario(requisicao, resposta) {
                 </tr>
             </thead>
             <tbody>`;
-    let i = 0;
+    let i = 1;
     for (let Cadastro of ListadeUsuario) {
       conteudoResposta += `
                         <tr>
@@ -426,4 +432,226 @@ function processaCadastroUsuario(requisicao, resposta) {
 
     resposta.end(conteudoResposta);
   }
+}
+
+function PostarMensagem(requisicao, resposta) {
+  const Usu = requisicao.body.Usuario;
+  const Men = requisicao.body.Mensagem;
+
+  if (Usu != '' && Men != '') {
+    const dat = new Date();
+    let Apelido_chat = BuscaApe(Usu);
+    const NovaMensagem = {
+      nome: Usu,
+      apelido: Apelido_chat,
+      mensagem: Men,
+      momento: dat.toLocaleDateString(),
+      Hora: dat.toLocaleTimeString()
+    };
+    Usuario_Mensagem.push(NovaMensagem);
+
+    let conteudoPagina = `
+    <!DOCTYPE html>
+  <html lang="pt-br">
+  
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Bate-Papo</title>
+      <link rel="icon" href="/Chat.png">
+      <link rel="stylesheet" href="/batepapo.css">
+      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  </head>
+  
+  <body>
+  <h1 class="text-center badge badge-pill badge-primary">Bate-Papo</h1>
+  <h1 class="text-center badge badge-pill badge-success">On</h1>
+  <a href="/" class="text-center badge badge-pill badge-secondary">Retornar ao Menu</a>
+      <div class="container">
+          <h1 class="text-center">Bate-Papo</h1>
+          <div class="border  border-primary rounded">`
+    for (let Mensagem of Usuario_Mensagem) {
+      conteudoPagina += `
+              <div class="border border-secondary rounded mx-5 my-5">
+                  <h6 class="ml-5 mt-5 ">${Mensagem.apelido}</h6>
+                  <p class=" pequeno ml-5">Enviado por ${Mensagem.nome} no dia ${Mensagem.momento} às ${Mensagem.Hora}</p>
+                  <p class="ml-5 mb-5">${Mensagem.mensagem}</p>
+              </div>
+              `;
+    }
+    conteudoPagina += `
+          </div>
+          <div class="mt-5 border">
+              <div class="mx-5 my-5">
+                  <form action="/postarMensagem" method="POST">
+                      <label>Enviar Mensagem</label>
+                      <label for="Usuario">Usuário</label>
+                      <select class="form-control col-md-3 my-3" name="Usuario" id="Usuario">
+                        <option value="">Selecione o Usuario</option>`;
+    for (let Usuarios of ListadeUsuario) {
+      conteudoPagina += `
+                      
+                          <option value="${Usuarios.nome}">${Usuarios.nome}</option>`;
+    }
+    conteudoPagina += `
+                        </select>
+                      <label for="mensagem">Mensagem:</label>
+                      <input class="form-control col-md-7 my-3" type="text" name="Mensagem" id="Mensagem">
+                      <input type="submit" class="btn btn-success ml-1 my-3" value="Enviar Mensagem">
+                  </form>
+              </div>
+          </div>
+      </div>
+  </body>
+  
+  
+  </html>
+    `;
+
+    resposta.end(conteudoPagina);
+  }
+  else {
+    let ConteudoErro = `
+    <!DOCTYPE html>
+    <html lang="pt-br">
+    
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Bate-Papo</title>
+        <link rel="icon" href="/Chat.png">
+        <link rel="stylesheet" href="/batepapo.css">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+            integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    </head>
+    
+    <body>
+    <h1 class="text-center badge badge-pill badge-primary">Bate-Papo</h1>
+    <h1 class="text-center badge badge-pill badge-success">On</h1>
+    <a href="/" class="text-center badge badge-pill badge-secondary">Retornar ao Menu</a>
+        <div class="container">
+            <h1 class="text-center">Bate-Papo</h1>
+            <div class="border  border-primary rounded">`
+    for (let Mensagem of Usuario_Mensagem) {
+      ConteudoErro += `
+                <div class="border border-secondary rounded mx-5 my-5">
+                    <h6 class="ml-5 mt-5 ">${Mensagem.apelido}</h6>
+                    <p class=" pequeno ml-5">Enviado por ${Mensagem.nome} no Dia ${Mensagem.momento} às ${Mensagem.Hora}</p>
+                    <p class="ml-5 mb-5">${Mensagem.mensagem}</p>
+                </div>
+                `;
+    }
+    ConteudoErro += `
+            </div>`
+    if (Usu != '' || Men != '') {
+      ConteudoErro += `<div class="mt-5 border border-danger">`
+    }
+    else {
+      ConteudoErro += `<div class="mt-5 border">`
+    }
+    ConteudoErro += `
+                <div class="mx-5 my-5">
+                    <form action="/postarMensagem" method="POST">
+                        <label>Enviar Mensagem</label>
+                        <label for="Usuario">Usuário</label>
+                        <select class="form-control col-md-3 my-3" name="Usuario" id="Usuario">
+                          <option value="">Selecione o Usuario</option>`;
+    for (let Usuarios of ListadeUsuario) {
+      ConteudoErro += `
+                        
+                            <option value="${Usuarios.nome}">${Usuarios.nome}</option>`;
+    }
+    ConteudoErro += `
+                          </select>
+                        <label for="mensagem">Mensagem:</label>
+                        <input class="form-control col-md-7 my-3" type="text" name="Mensagem" id="Mensagem" value="${Men}">
+                        <input type="submit" class="btn btn-success ml-1 my-3" value="Enviar Mensagem">`;
+                        if (Usu != '' || Men != ''){
+                          ConteudoErro += `<p class="text-danger">Usuario ou Mensagem nao podem estar em branco</p>`;
+                        }
+                        ConteudoErro +=`
+                    </form>
+                </div>
+            </div>
+        </div>
+    </body>
+    
+    </html>
+    `;
+    resposta.end(ConteudoErro);
+  }
+  
+}
+
+function NovaMensagem(requisicao, resposta) {
+  let conteudoPagina = `
+  <!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bate-Papo</title>
+    <link rel="icon" href="/Chat.png">
+    <link rel="stylesheet" href="/batepapo.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+</head>
+
+<body>
+<h1 class="text-center badge badge-pill badge-primary">Bate-Papo</h1>
+<h1 class="text-center badge badge-pill badge-success">On</h1>
+<a href="/" class="text-center badge badge-pill badge-secondary">Retornar ao Menu</a>
+    <div class="container">
+        <h1 class="text-center">Bate-Papo</h1>
+        <div class="border  border-primary rounded">`
+  for (let Mensagem of Usuario_Mensagem) {
+    conteudoPagina += `
+            <div class="border border-secondary rounded mx-5 my-5">
+                <h6 class="ml-5 mt-5 ">${Mensagem.apelido}</h6>
+                <p class=" pequeno ml-5">Enviado por ${Mensagem.nome} no dia ${Mensagem.momento} às ${Mensagem.Hora} </p>
+                <p class="ml-5 mb-5">${Mensagem.mensagem}</p>
+            </div>
+            `;
+  }
+  conteudoPagina += `
+        </div>
+        <div class="mt-5 border">
+            <div class="mx-5 my-5">
+                <form action="/postarMensagem" method="POST">
+                    <label>Enviar Mensagem</label>
+                    <label for="Usuario">Usuário</label>
+                    <select class="form-control col-md-3 my-3" name="Usuario" id="Usuario">
+                      <option value="">Selecione o Usuario</option>`;
+  for (let Usuarios of ListadeUsuario) {
+    conteudoPagina += `
+                    
+                        <option value="${Usuarios.nome}">${Usuarios.nome}</option>`;
+  }
+  conteudoPagina += `
+                      </select>
+                    <label for="mensagem">Mensagem:</label>
+                    <input class="form-control col-md-7 my-3" type="text" name="Mensagem" id="Mensagem">
+                    <input type="submit" class="btn btn-success ml-1 my-3" value="Enviar Mensagem">
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+  `;
+  resposta.end(conteudoPagina);
+}
+
+function BuscaApe(nome) {
+  let apelido = "";
+  for (let busca of ListadeUsuario) {
+    if (nome == busca.nome) {
+      apelido = busca.apelido;
+    }
+  }
+  console.log(apelido);
+  return apelido;
 }
