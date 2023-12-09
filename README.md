@@ -2,7 +2,7 @@
 Projeto de Avaliação do uso de metodos e da tecnologia Node, trabalho final da disciplina PROGRAMAÇÃO PARA INTERNET
 
 # Site no Vercel
-projeto-final-programa-o-para-internet.vercel.app
+https://projeto-final-programa-o-para-internet.vercel.app/
 
 # Descrição
 O Site conta com Registro e Login, Primeiro você registra-se no site e logo após loga com o cadastro que acabou de fazer.
