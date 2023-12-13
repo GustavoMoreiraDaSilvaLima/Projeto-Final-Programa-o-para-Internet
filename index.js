@@ -91,7 +91,7 @@ function PaginaMenu(requisicao, resposta) {
           </div>
   
       </div>
-      <p class="par text-right" style="margin-top: 500px;">Seu Ultimo acesso foi em <strong class="last-acess">${dataUltimoAcesso}</strong></p>
+      <p class="par text-right" style="margin-top: 500px;">Seu Ultimo acesso foi em <strong class="last-ace ss">${dataUltimoAcesso}</strong></p>
   
   </body>
   
@@ -576,10 +576,10 @@ function PostarMensagem(requisicao, resposta) {
                         <label for="mensagem">Mensagem:</label>
                         <input class="form-control col-md-7 my-3" type="text" name="Mensagem" id="Mensagem" value="${Men}">
                         <input type="submit" class="btn btn-success ml-1 my-3" value="Enviar Mensagem">`;
-                        if (Usu != '' || Men != ''){
-                          ConteudoErro += `<p class="text-danger">Usuario ou Mensagem nao podem estar em branco</p>`;
-                        }
-                        ConteudoErro +=`
+    if (Usu != '' || Men != '') {
+      ConteudoErro += `<p class="text-danger">Usuario ou Mensagem nao podem estar em branco</p>`;
+    }
+    ConteudoErro += `
                     </form>
                 </div>
             </div>
@@ -590,7 +590,7 @@ function PostarMensagem(requisicao, resposta) {
     `;
     resposta.end(ConteudoErro);
   }
-  
+
 }
 
 function NovaMensagem(requisicao, resposta) {
